@@ -2,33 +2,43 @@
 
 import sys
 import json
+import argparse
 from psd_tools import PSDImage
 
-def save_layer(layer, info, prefix=''):
+def parseArgs():
+    parser = argparse.ArgumentParser(description='Cut your psds with no Photoshop.')
+    parser.add_argument('psd', help='a psd file to cut')
+    parser.add_argument('-l', '--layer', help='cut only a specific layer')
+    return parser.parse_args()
+
+def save_layer(layer, info, args, save=True, prefix=''):
     if not layer.is_visible():
         return
 
+    if args.layer != None and layer.name == args.layer:
+        save = True
+
     if not layer.is_group():
         name = f"{prefix}{layer.name}"
+
+        if not save: return
 
         print(f"Saving {name}...", file=sys.stderr)
         layer.topil().save(f'{name}.png')
         info.append({'image': f'pack/{name}', 'position': {'x': layer.bbox[0], 'y': layer.bbox[1]}})
     else:
         for child in layer:
-            save_layer(child, info, f"{layer.name}-")
+            save_layer(child, info, args, save, f"{layer.name}-")
 
 def main():
-    if len(sys.argv) < 2:
-        print("Usage: cut.py image.psd", file=sys.stderr)
-        return 1
+    args = parseArgs()
 
-    psd_name = sys.argv[1]
+    psd_name = args.psd
     psd = PSDImage.open(psd_name)
 
     info = []
     for layer in psd:
-        save_layer(layer, info)
+        save_layer(layer, info, args, args.layer == None)
 
     print(json.dumps(info, indent=4))
 
