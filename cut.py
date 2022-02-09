@@ -9,6 +9,7 @@ def parseArgs():
     parser = argparse.ArgumentParser(description='Cut your psds with no Photoshop.')
     parser.add_argument('psd', help='a psd file to cut')
     parser.add_argument('-l', '--layer', help='cut only a specific layer')
+    parser.add_argument('-p', '--pos', action='store_true', help="only show a positioning info, don't export images")
     return parser.parse_args()
 
 def save_layer(layer, info, args, save=True, prefix=''):
@@ -23,8 +24,10 @@ def save_layer(layer, info, args, save=True, prefix=''):
 
         if not save: return
 
-        print(f"Saving {name}...", file=sys.stderr)
-        layer.topil().save(f'{name}.png')
+        if not args.pos:
+            print(f"Saving {name}...", file=sys.stderr)
+            layer.topil().save(f'{name}.png')
+
         info.append({'image': f'pack/{name}', 'position': {'x': layer.bbox[0], 'y': layer.bbox[1]}})
     else:
         for child in layer:
