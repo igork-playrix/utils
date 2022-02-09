@@ -31,7 +31,7 @@ def save_layer(layer, info, args, save=True, prefix=''):
         info.append({'image': f'pack/{name}', 'position': {'x': layer.bbox[0], 'y': layer.bbox[1]}})
     else:
         for child in layer:
-            save_layer(child, info, args, save, f"{layer.name}-")
+            save_layer(child, info, args, save, f"{prefix}{layer.name}-")
 
 def main():
     args = parseArgs()
