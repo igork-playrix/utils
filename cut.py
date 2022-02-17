@@ -10,10 +10,11 @@ def parseArgs():
     parser.add_argument('psd', help='a psd file to cut')
     parser.add_argument('-l', '--layer', help='cut only a specific layer')
     parser.add_argument('-p', '--pos', action='store_true', help="only show a positioning info, don't export images")
+    parser.add_argument('-i', '--invisible', action='store_true', help='ignore visibility')
     return parser.parse_args()
 
 def save_layer(layer, info, args, save=True, prefix=''):
-    if not layer.is_visible():
+    if not args.invisible and not layer.is_visible():
         return
 
     if args.layer != None and layer.name == args.layer:
@@ -28,7 +29,7 @@ def save_layer(layer, info, args, save=True, prefix=''):
             print(f"Saving {name}...", file=sys.stderr)
             layer.topil().save(f'{name}.png')
 
-        info.append({'image': f'pack/{name}', 'position': {'x': layer.bbox[0], 'y': layer.bbox[1]}})
+        info.append({'image': f'{name}', 'position': {'x': layer.bbox[0], 'y': layer.bbox[1]}})
     else:
         for child in layer:
             save_layer(child, info, args, save, f"{prefix}{layer.name}-")
