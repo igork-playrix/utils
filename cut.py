@@ -19,7 +19,7 @@ def mkdir(name):
     try:
         os.mkdir(name)
     except FileExistsError:
-        print(f"Folder '{name}' already exists, skipping...", file=sys.stderr)
+        # print(f"Folder '{name}' already exists, skipping...", file=sys.stderr)
         return
 
 def save_layer(layer, info, args, save=True, prefix=''):
